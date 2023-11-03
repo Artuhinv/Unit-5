@@ -9,18 +9,19 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
 @RestController
-@RequestMapping("/weather")
+@RequestMapping
 public class WeatherController {
     @Value("${openweathermap.apikey}")
     private String apiKey;
+    @Value("${url}")
+    private String url;
     @Autowired
     private RestTemplate restTemplate;
 
-    @GetMapping("/{lat}/{lon}")
+    @GetMapping
     @Cacheable(value = "cacheForWeathers",key = "#lat+':'+#lon")
-    public Main getWeather(@PathVariable double lat, @PathVariable double lon) {
-        String url = "https://api.openweathermap.org/data/2.5/weather?lat=" + lat + "&lon=" + lon + "&appid=" + apiKey;
-
-        return restTemplate.getForObject(url, Root.class).getMain();
+    public Main getWeather(@RequestParam String lat, @RequestParam String lon) {
+        String url1 = String.format("%s?lat=%s&lon=%s&units=metric&appid=%s", url, lat, lon, apiKey);
+        return restTemplate.getForObject(url1, Root.class).getMain();
     }
 }

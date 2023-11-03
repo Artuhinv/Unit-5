@@ -3,6 +3,7 @@ package com.example.controller;
 import com.example.model.*;
 import com.example.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,12 +19,14 @@ public class PersonController {
     private PersonRepository repository;
     @Autowired
     private RestTemplate restTemplate;
+    @Value("${url}")
+    String url;
 
     @GetMapping("{id}/weather")
     public ResponseEntity<Weather> getWeather(@PathVariable int id) {
         if (repository.existsById(id)) {
             String location = repository.findById(id).get().getLocation();
-            Weather weather = restTemplate.getForObject("http://localhost:8081/location/weather?weather=" + location, Weather.class);
+            Weather weather = restTemplate.getForObject("http://" + url + "/location/weather?weather=" + location, Weather.class);
             return new ResponseEntity(weather, HttpStatus.OK);
         }
         return new ResponseEntity(null, HttpStatus.NOT_FOUND);
