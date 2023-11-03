@@ -24,11 +24,19 @@ public class LocationController {
     public Optional<Location> getWeather(@RequestParam String location) {
         return repository.findByName(location);
     }
+
     @GetMapping("/weather")
-    public Weather redirectRequestWeather(@RequestParam String weather) {
-        Location location = repository.findByName(weather).get();
-        String url = String.format("http://localhost:8082/weather/%s/%s", location.getLat(), location.getLon());
-        return restTemplate.getForObject(url, Weather.class);
+    public ResponseEntity<Weather> redirectRequestWeather(@RequestParam("weather") String weather) {
+        Optional<Location> locationOptional = repository.findByName(weather);
+        if(locationOptional.isPresent()) {
+            Location location = locationOptional.get();
+            String url = String.format("http://localhost:8082/weather/%s/%s", location.getLat(), location.getLon());
+            Weather weather_loc = restTemplate.getForObject(url, Weather.class);
+            return new ResponseEntity<>(weather_loc,HttpStatus.OK);
+        }
+        else {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
     }
     @GetMapping("/all")
     public Iterable<Location> getMessages() {

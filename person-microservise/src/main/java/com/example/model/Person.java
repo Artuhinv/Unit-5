@@ -9,4 +9,5 @@ public class Person {
     @Id @GeneratedValue
     private int id;
     @NonNull private String name;
+    @NonNull private String location;
 }
